@@ -23,18 +23,18 @@
 - ![各方法](MAB/Figure_1.png)
 - ![epsilon](MAB/Figure_2.png)
 
-- 固定 ε 的贪心策略懊悔随时间线性增长，无法收敛
+- 固定 $\varepsilon$ 的贪心策略懊悔随时间线性增长，无法收敛
 - UCB 和 Thompson 采样通过对不确定性的建模实现次线性懊悔
-- 衰减 ε-贪心也能达到对数懊悔
+- 衰减 $\varepsilon$-贪心也能达到对数懊悔
 ---
 
 ### 2. 马尔可夫决策过程（Markov Decision Process）
 
 [MDP/mrp.py](MDP/mrp.py) · [MDP/mdp.py](MDP/mdp.py)
 
-- **MRP 价值计算**（[mrp.py](MDP/mrp.py)）：用贝尔曼方程的矩阵形式 `V = (I - γP)⁻¹R` 解析求解状态价值函数
-- **MDP 到 MRP 的转化**（[mdp.py](MDP/mdp.py)）：给定策略 π，将 MDP 边缘化为 MRP——`r(s) = Σ_a π(a|s)·r(s,a)`，`P(s'|s) = Σ_a π(a|s)·P(s'|s,a)`
-- **动作价值函数计算**：`Q(s,a) = r(s,a) + γ·Σ_{s'} P(s'|s,a)·V(s')`
+- **MRP 价值计算**（[mrp.py](MDP/mrp.py)）：用贝尔曼方程的矩阵形式 $V = (I - \gamma P)^{-1}R$ 解析求解状态价值函数
+- **MDP 到 MRP 的转化**（[mdp.py](MDP/mdp.py)）：给定策略 $\pi$，将 MDP 边缘化为 MRP——$r(s) = \sum_a \pi(a|s) r(s,a)$，$P(s'|s) = \sum_a \pi(a|s) P(s'|s,a)$
+- **动作价值函数计算**：$Q(s,a) = r(s,a) + \gamma \sum_{s'} P(s'|s,a) V(s')$
 - **蒙特卡洛评估**：实现在 [mdp.py](MDP/mdp.py) 通过采样回合轨迹，用增量均值估计状态价值
 - **占用度量估计**：实现在 [mdp.py](MDP/mdp.py) 估计某策略下状态-动作对的访问频率
 ---
@@ -50,7 +50,7 @@
 | 算法 | 流程 | 收敛条件 |
 |------|------|----------|
 | 策略迭代 | 策略评估 → 策略提升 → 循环 | 策略不再变化 |
-| 价值迭代 | 反复应用贝尔曼最优方程 `V(s) = max_a Q(s,a)` | 价值函数收敛 |
+| 价值迭代 | 反复应用贝尔曼最优方程 $V(s) = \max_a Q(s,a)$ | 价值函数收敛 |
 
 - 策略迭代通过"评估-改进"交替保证单调提升，最终收敛到最优策略
 - 价值迭代直接对贝尔曼最优算子做不动点迭代，通常更简洁
@@ -70,9 +70,9 @@
 **算法：**
 | 算法 | 更新规则 | 类型 |
 |------|---------|------|
-| Sarsa | `Q(s,a) ← Q(s,a) + α[r + γQ(s',a') - Q(s,a)]` | 在线策略（on-policy） |
-| n 步 Sarsa | `Q(s_t,a_t) ← Q(s_t,a_t) + α[r_t + γr_{t + 1}+ … + γ^nQ(s_{t + n},a_{t + n}) - Q(s_t,a_t)]` | 在线策略 |
-| Q-Learning | `Q(s,a) ← Q(s,a) + α[r + γ max_{a'} Q(s',a') - Q(s,a)]` | 离线策略（off-policy） |
+| Sarsa | $Q(s,a) \leftarrow Q(s,a) + \alpha [r + \gamma Q(s',a') - Q(s,a)]$ | 在线策略（on-policy） |
+| n 步 Sarsa | $Q(s_t,a_t) \leftarrow Q(s_t,a_t) + \alpha [\sum_{i=0}^{n-1} \gamma^i r_{t+i+1} + \gamma^n Q(s_{t+n},a_{t+n}) - Q(s_t,a_t)]$ | 在线策略 |
+| Q-Learning | $Q(s,a) \leftarrow Q(s,a) + \alpha [r + \gamma \max_{a'} Q(s',a') - Q(s,a)]$ | 离线策略（off-policy） |
 
 
 在悬崖漫步环境中训练 500 回合，对比 Sarsa 和 Q-Learning 的学习曲线与最终策略：
@@ -88,7 +88,7 @@
 
 - Sarsa（在线策略）：行动策略和目标策略相同，学到的是在悬崖漫步中倾向于远离悬崖
 - n 步 Sarsa：通过多步回报在偏差和方差之间取得平衡，n 越大越接近蒙特卡洛
-- Q-Learning（离线策略）：目标策略是贪心的，行动策略是 ε-贪心的，学到的策略紧贴悬崖边走
+- Q-Learning（离线策略）：目标策略是贪心的，行动策略是 $\varepsilon$-贪心的，学到的策略紧贴悬崖边走
 - 环境从"提供转移模型 P"（DP 版）变为"仅提供 step/reset 接口"（TD 版），这是从有模型到无模型的关键转变
 ---
 
@@ -99,10 +99,10 @@
 Dyna-Q 在与环境交互学习 Q 值的同时，学习一个环境模型，并利用模型进行经验学习。
 
 **算法：**
-1. 用 ε-贪心策略选择动作，与环境交互得到 `(s, a, r, s')`
+1. 用 $\varepsilon$-贪心策略选择动作，与环境交互得到 $(s, a, r, s')$
 2. 用真实经验做一次 Q-Learning 更新
-3. 将 `(s, a) → (r, s')` 存入模型字典
-4. **重复 n 次 planning**：随机采样已经历过的 `(s, a)`，从模型中取出 `(r, s')`，做一次 Q-Learning 更新
+3. 将 $(s, a) \rightarrow (r, s')$ 存入模型字典
+4. **重复 $n$ 次 planning**：随机采样已经历过的 $(s, a)$，从模型中取出 $(r, s')$，做一次 Q-Learning 更新
 
 在悬崖漫步上对比规划步数 n = 0、2、20 的学习效果
 ![学习效果](Dyna-Q/Figure_1.png)

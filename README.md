@@ -5,7 +5,7 @@
 ## 基础篇
 | 目录 | 教程章节 | 核心概念 |
 |------|----------|----------|
-| [MAB/](MAB/) | 第 2 章：多臂老虎机 | 累积懊悔、$\varepsilon$-贪心、UCB、Thompson 采样 |
+| [MAB/](MAB/) | 第 2 章：多臂老虎机 | 累积懊悔、ε-贪心、UCB、Thompson 采样 |
 | [MDP/](MDP/) | 第 3 章：马尔可夫决策过程 | MRP、MDP、贝尔曼方程、蒙特卡洛评估、占用度量 |
 | [DP/](DP/) | 第 4 章：动态规划 | 策略迭代、价值迭代 |
 | [DT/](DT/) | 第 5 章：时序差分算法 | Sarsa、n 步 Sarsa、Q-Learning |
@@ -23,9 +23,9 @@
 - ![各方法](MAB/Figure_1.png)
 - ![epsilon](MAB/Figure_2.png)
 
-- 固定 $\varepsilon$ 的贪心策略懊悔随时间线性增长，无法收敛
+- 固定 ε 的贪心策略懊悔随时间线性增长，无法收敛
 - UCB 和 Thompson 采样通过对不确定性的建模实现次线性懊悔
-- 衰减 $\varepsilon$-贪心也能达到对数懊悔
+- 衰减 ε-贪心也能达到对数懊悔
 ---
 
 ### 2. 马尔可夫决策过程（Markov Decision Process）
@@ -33,8 +33,13 @@
 [MDP/mrp.py](MDP/mrp.py) · [MDP/mdp.py](MDP/mdp.py)
 
 - **MRP 价值计算**（[mrp.py](MDP/mrp.py)）：用贝尔曼方程的矩阵形式 $V = (I - \gamma P)^{-1}R$ 解析求解状态价值函数
-- **MDP 到 MRP 的转化**（[mdp.py](MDP/mdp.py)）：给定策略 $\pi$，将 MDP 边缘化为 MRP——$r(s) = \sum_a \pi(a \mid s) r(s,a)$，$P(s' \mid s) = \sum_a \pi(a \mid s) P(s' \mid s,a)$
-- **动作价值函数计算**：$Q(s,a) = r(s,a) + \gamma \sum_{s'} P(s' \mid s,a) V(s')$
+- **MDP 到 MRP 的转化**（[mdp.py](MDP/mdp.py)）：给定策略 π，将 MDP 边缘化为 MRP
+
+  $$r(s) = \sum_a \pi(a \mid s) r(s,a), \quad P(s' \mid s) = \sum_a \pi(a \mid s) P(s' \mid s,a)$$
+
+- **动作价值函数计算**：
+
+  $$Q(s,a) = r(s,a) + \gamma \sum_{s'} P(s' \mid s,a) V(s')$$
 - **蒙特卡洛评估**：实现在 [mdp.py](MDP/mdp.py) 通过采样回合轨迹，用增量均值估计状态价值
 - **占用度量估计**：实现在 [mdp.py](MDP/mdp.py) 估计某策略下状态-动作对的访问频率
 ---
@@ -88,7 +93,7 @@
 
 - Sarsa（在线策略）：行动策略和目标策略相同，学到的是在悬崖漫步中倾向于远离悬崖
 - n 步 Sarsa：通过多步回报在偏差和方差之间取得平衡，n 越大越接近蒙特卡洛
-- Q-Learning（离线策略）：目标策略是贪心的，行动策略是 $\varepsilon$-贪心的，学到的策略紧贴悬崖边走
+- Q-Learning（离线策略）：目标策略是贪心的，行动策略是 ε-贪心的，学到的策略紧贴悬崖边走
 - 环境从"提供转移模型 P"（DP 版）变为"仅提供 step/reset 接口"（TD 版），这是从有模型到无模型的关键转变
 ---
 
@@ -99,7 +104,7 @@
 Dyna-Q 在与环境交互学习 Q 值的同时，学习一个环境模型，并利用模型进行经验学习。
 
 **算法：**
-1. 用 $\varepsilon$-贪心策略选择动作，与环境交互得到 $(s, a, r, s')$
+1. 用 ε-贪心策略选择动作，与环境交互得到 $(s, a, r, s')$
 2. 用真实经验做一次 Q-Learning 更新
 3. 将 $(s, a) \rightarrow (r, s')$ 存入模型字典
 4. **重复 $n$ 次 planning**：随机采样已经历过的 $(s, a)$，从模型中取出 $(r, s')$，做一次 Q-Learning 更新

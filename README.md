@@ -205,8 +205,17 @@ $$
 $$
 
 - 用全连接网络输出 `softmax` 概率分布，按概率采样动作
-- 每回合结束后从后往前累加折扣回报 $G_t = \gamma G_{t+1} + r_t$
-- 损失：$L = -\sum_t \log \pi_\theta(a_t|s_t)\cdot G_t$
+- 每回合结束后从后往前累加折扣回报：
+
+$$
+G_t = \gamma\, G_{t+1} + r_t
+$$
+
+- 损失：
+
+$$
+L = -\sum_t \log \pi_\theta(a_t \mid s_t)\cdot G_t
+$$
 
 **结果（CartPole-v1）：**
 - ![REINFORCE 曲线](9_PG/REINFORCE1.png) ![REINFORCE 平滑](9_PG/REINFORCE2.png)
@@ -264,9 +273,18 @@ $$
 $$
 
 **实现要点**：
-- 用 GAE（广义优势估计）计算优势：$A_t = \sum_{i=0}^{T-t} (\gamma\lambda)^i \delta_{t+i}$
+- 用 GAE（广义优势估计）计算优势：
+
+$$
+A_t = \sum_{i=0}^{T-t} (\gamma\lambda)^{i}\, \delta_{t+i}
+$$
+
 - 策略更新通过**共轭梯度法**求解 $H^{-1}g$，再用**线搜索**保证信赖域约束满足
-- 连续动作空间版本使用高斯策略 $\mathcal{N}(\mu_\theta(s), \Sigma_\theta(s))$
+- 连续动作空间版本使用高斯策略：
+
+$$
+\mathcal{N}\!\big(\mu_\theta(s),\,\Sigma_\theta(s)\big)
+$$
 
 **结果（CartPole-v1 / Pendulum-v1）：**
 - ![TRPO 离散 曲线](11_TRPO/Figure_1.png) ![TRPO 离散 平滑](11_TRPO/Figure_2.png)
